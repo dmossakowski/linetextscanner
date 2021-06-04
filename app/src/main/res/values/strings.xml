@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Line Text Scanner by <a href="https://davidmossakowski.com">Raise Plow</a></string>
+    <string name="select_image_for_text_recognition">image...</string>
+    <string name="find_text_button">Gallery</string>
+    <string name="find_face_contour_button">Camera</string>
+    <string name="find_text_cloud_button">Find text (cloud)</string>
+    <string name="find_objects_button">Find objects</string>
+</resources>
