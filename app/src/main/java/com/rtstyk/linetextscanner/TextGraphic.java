@@ -32,7 +32,7 @@ public class TextGraphic extends Graphic {
 
     private static final String TAG = "TextGraphic";
     private static final int TEXT_COLOR = Color.WHITE;
-    private static final float TEXT_SIZE = 56.0f;
+    private static final float TEXT_SIZE = 50.0f;
     private static final float STROKE_WIDTH = 4.0f;
 
     private final Paint rectPaint;
@@ -52,6 +52,7 @@ public class TextGraphic extends Graphic {
         textPaint = new Paint();
         textPaint.setColor(TEXT_COLOR);
         textPaint.setTextSize(TEXT_SIZE);
+        //textPaint.sette
         // Redraw the overlay, as this graphic has been added.
         postInvalidate();
     }

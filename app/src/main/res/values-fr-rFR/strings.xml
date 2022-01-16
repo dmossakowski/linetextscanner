@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Line Text Scanner</string>
+    <string name="select_image_for_text_recognition">image....</string>
+    <string name="find_text_button">Galerie</string>
+    <string name="find_face_contour_button">Camera</string>
+    <string name="find_text_cloud_button">Trouvez text</string>
+    <string name="find_objects_button">Trouvez object</string>
+    <string name="toolbar_mi_developer_page">Develope au David Mossakowski</string>
+    <string name="toolbar_mi_help">Help</string>
+</resources>

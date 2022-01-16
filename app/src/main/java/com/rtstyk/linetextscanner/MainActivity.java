@@ -34,6 +34,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.exifinterface.media.ExifInterface;
@@ -43,6 +44,8 @@ import android.provider.MediaStore;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -51,7 +54,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
+
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -85,8 +88,10 @@ import java.util.PriorityQueue;
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private static final String TAG = "MainActivity";
     private ImageView mImageView;
-    private Button mTextButton;
-    private Button mFaceButton;
+    //private Button mTextButton;
+    //private Button mFaceButton;
+    View mImageButtonGallery;
+    View mImageButtonCamera;
     private Bitmap mSelectedImage;
     private GraphicOverlay mGraphicOverlay;
     // Max width (portrait mode)
@@ -106,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private static final int SWIPE_THRESHOLD_VELOCITY = 200;
 
     private TextElementComparator textElementComparator = new TextElementComparator();
-
+    private boolean helpActivated = false;
 
     /**
      * Number of results to show in the UI.
@@ -138,8 +143,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         mImageView = findViewById(R.id.image_view);
 
-        mTextButton = findViewById(R.id.button_text);
-        mFaceButton = findViewById(R.id.button_face);
+        //mTextButton = findViewById(R.id.button_text);
+        //mFaceButton = findViewById(R.id.button_face);
+        View mImageButtonGallery = findViewById(R.id.galleryButton);
+        View mImageButtonCamera = findViewById(R.id.cameraButton);
 
         mGraphicOverlay = findViewById(R.id.graphic_overlay);
 
@@ -151,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //setContentView(R.layout.activity_main);
         mDetector = new GestureDetectorCompat(mImageView.getContext(), new MyGestureListener());
 
-        mTextButton.setOnClickListener(new View.OnClickListener() {
+        mImageButtonGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openGallery();
@@ -159,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             }
         });
-        mFaceButton.setOnClickListener(new View.OnClickListener() {
+        mImageButtonCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //openGallery();
@@ -175,8 +182,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
 
-        TextView topline = findViewById(R.id.title);
-
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
+        //myToolbar.setTitle();
 
         //Toolbar toolbar = (Toolbar) findViewById(R.id.);
 
@@ -211,15 +219,30 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         dropdown.setOnItemSelectedListener(this);*/
     }
 
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.toolbar_menu, menu);
+        return true;
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if (item.getItemId() == android.R.id.home) {
+        if (item.getItemId() == R.id.item_dev_site) {
 
             Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-                    Uri.parse("http://www.google.com"));
+                    Uri.parse("https://davidmossakowski.com"));
             startActivity(browserIntent);
             return true;
+        }else if(item.getItemId() == R.id.item_help){
+            //textView.setText("");
+            //textView.setVisibility(View.INVISIBLE);
+            mGraphicOverlay.setVisibility(View.INVISIBLE);
+            textView.setVisibility(View.INVISIBLE);
+            Bitmap helpImage = getBitmapFromAsset(this, "receipt1.jpg");
+            //helpImage.g
+            mImageView.setImageBitmap(helpImage);
+            helpActivated=true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -269,6 +292,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public boolean onTouchEvent(MotionEvent event){
+        if (helpActivated){
+            mImageView.setImageBitmap(mSelectedImage);
+            mGraphicOverlay.setVisibility(View.VISIBLE);
+            helpActivated=false;
+            return true;
+        }
+
         this.mDetector.onTouchEvent(event);
         return super.onTouchEvent(event);
     }
@@ -392,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2,
                                float velocityX, float velocityY) {
-            Log.d(DEBUG_TAG, "onFling: " + e1.toString() + e2.toString());
+            //Log.d(DEBUG_TAG, "onFling: " + e1.toString() + e2.toString());
             //mGraphicOverlay.clear();
             if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                 // Right to left
@@ -408,7 +438,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             if(e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
                 // Bottom to top
                 //Your code to flip the coin
-                Log.println(Log.VERBOSE,"Coin", "Coin flipped");
+                //Log.println(Log.VERBOSE,"Coin", "Coin flipped");
                 //runTextRecognition();
                 return false;
             }  else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
@@ -559,7 +589,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     //Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
                     //Bundle extras = data.getExtras();
 
-                    Bitmap temp = getBitmapFromAsset(this, currentPhotoPath);
+                    //Bitmap temp = getBitmapFromAsset(this, currentPhotoPath);
                     //Bitmap temp2 = Bitmap.createScaledBitmap(temp, width, height, false);
                     //Bitmap temp2 = scaleDown(temp,)
 
@@ -825,14 +855,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void runTextRecognition() {
         InputImage image = InputImage.fromBitmap(mSelectedImage, 0);
         TextRecognizer recognizer = TextRecognition.getClient();
-        mTextButton.setEnabled(false);
+        //mTextButton.setEnabled(false);
 
         recognizer.process(image)
                 .addOnSuccessListener(
                         new OnSuccessListener<Text>() {
                             @Override
                             public void onSuccess(Text texts) {
-                                mTextButton.setEnabled(true);
+                                //mTextButton.setEnabled(true);
                                 processTextRecognitionResult(texts);
                             }
                         })
@@ -841,7 +871,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 // Task failed with an exception
-                                mTextButton.setEnabled(true);
+                                //mTextButton.setEnabled(true);
                                 e.printStackTrace();
                             }
                         });
@@ -893,9 +923,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private List<Text.Element> regenerateText(List<Text.Element> textElements, TextView lTextView)
     {
-        Log.i("sorting",textElements.size()+" ------------------------------ ");
+        Log.d("sorting",textElements.size()+" ------------------------------ ");
         Collections.sort(textElements, textElementComparator);
-        Log.i("processing",textElements.size()+" ------------------------------ ");
+        Log.d("processing",textElements.size()+" ------------------------------ ");
 
         List<List<Text.Element>> lines = new ArrayList<>();
         List<Text.Element> currentLine = new ArrayList<>();
@@ -906,7 +936,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             Rect rect = textElements.get(i).getBoundingBox();
             Text.Element element = textElements.get(i);
-            Log.i("rect" + i, rect.top + " " + rect.left + " " + rect.bottom + " c:x" +
+            Log.d("rect" + i, rect.top + " " + rect.left + " " + rect.bottom + " c:x" +
                     rect.centerX() + " cy:" + rect.centerY() + " " + element.getText());
 
             if (currentLine.size() == 0)
@@ -915,7 +945,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 Text.Element previousElement = currentLine.get(currentLine.size() - 1);
                 if (isSameLine(previousElement, element)) {
                     currentLine.add(element);
-                    //Log.i("same line", previousElement.getText() + " " + element.getText() + " ");
+                    Log.d("same line", previousElement.getText() + " " + element.getText() + " ");
                 } else { //evaluate if we should keep this line
                     String t = previousElement.getText();
                     //if (t.contains(",") && t.matches("^[0-9].*$"))
@@ -927,7 +957,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         lines.add(currentLine);
 
 
-                    //Log.i("new line", element.getText() + " ");
+                    Log.i("new line", element.getText() + " ");
                     //} else {
                     //    currentLine.clear();
                     //    currentLine.add(element);
@@ -1002,7 +1032,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return true;
     }
 
-    class TextElementComparator implements Comparator<Text.Element> {
+    class TextElementComparator2 implements Comparator<Text.Element> {
         @Override
         public int compare(Text.Element t1, Text.Element t2) {
             int diffOfTops = t1.getBoundingBox().top - t2.getBoundingBox().top;
@@ -1017,15 +1047,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }else {
                 result = diffOfLefts;
             }
-            Log.i("compare", t1.getBoundingBox().top+ " "+ t2.getBoundingBox().top+
-                    " " + t1.getBoundingBox().left+ " " + t2.getBoundingBox().left+ " "+
-                    diffOfTops + " " + diffOfLefts + " height:" + height+"  "+result +"  "+
-                    t1.getText() + "-" + t2.getText() + "  " );
+            //Log.d("compare", t1.getBoundingBox().top+ " "+ t2.getBoundingBox().top+
+              //      " " + t1.getBoundingBox().left+ " " + t2.getBoundingBox().left+ " "+
+                //    diffOfTops + " " + diffOfLefts + " height:" + height+"  "+result +"  "+
+                  //  t1.getText() + "-" + t2.getText() + "  " );
             return result;
         }
     }
 
-    class TextElementComparator2 implements Comparator<Text.Element> {
+    class TextElementComparator implements Comparator<Text.Element> {
         @Override
         public int compare(Text.Element t1, Text.Element t2) {
             int diffOfTops = t1.getBoundingBox().top - t2.getBoundingBox().top;
