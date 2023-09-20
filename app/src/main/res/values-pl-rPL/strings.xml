@@ -8,4 +8,8 @@
     <string name="find_objects_button">Znajdz obiekt</string>
     <string name="toolbar_mi_developer_page">Kodowane przez Dawida Mossakowskikego</string>
     <string name="toolbar_mi_help">Pomoc</string>
+    <string name="toolbar_mi_scan">Skan</string>
+    <string name="toolbar_mi_camera">Aparat</string>
+    <string name="toolbar_mi_gallery">Galeria</string>
+
 </resources>
