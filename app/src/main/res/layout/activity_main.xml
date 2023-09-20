@@ -35,10 +35,10 @@
         android:layout_height="0dp"
         android:layout_alignParentStart="true"
         android:shadowColor="#00ccff"
+        android:shadowDx="3"
+        android:shadowDy="3"
         android:shadowRadius="1.5"
-        android:shadowDx="1"
-        android:shadowDy="1"
-        app:layout_constraintBottom_toTopOf="@id/linearLayout"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="@id/image_view"
         app:layout_constraintRight_toRightOf="@id/image_view"
@@ -73,45 +73,60 @@
 
         <ImageButton
             android:id="@+id/galleryButton"
-            style="@style/Widget.AppCompat.ImageButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            style="@android:style/Widget.DeviceDefault.ImageButton"
+            android:layout_width="10dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:layout_weight=".5"
-            android:layout_marginRight=".5dp"
-            android:background="@color/colorPrimary"
+
+            android:adjustViewBounds="true"
+            android:background="@android:color/background_light"
             android:contentDescription="@string/find_text_button"
+            android:cropToPadding="true"
+            android:scaleType="centerInside"
             app:srcCompat="@android:drawable/ic_menu_gallery" />
+        <!--android:src="@drawable/ic_menu_gallery"
+        app:srcCompat="@android:drawable/ic_menu_gallery"-->
+
+        <!--android:background="@android:drawable/ic_menu_gallery"-->
+
 
         <ImageButton
             android:id="@+id/cameraButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="10dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:layout_weight=".5"
-            android:layout_marginLeft=".5dp"
-            android:background="@color/colorPrimary"
+            android:background="@android:color/background_light"
             android:contentDescription="@string/find_face_contour_button"
             app:srcCompat="@android:drawable/ic_menu_camera" />
+            />
+        <!--
+        app:srcCompat="@android:drawable/ic_menu_camera"
+        -->
 
-        <Button
-            android:id="@+id/button_text"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="0dp"
-            android:layout_height="55dp"
-            android:layout_weight=".5"
-            android:text="@string/find_text_button"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/button_face" />
+    <Button
+        android:id="@+id/button_text"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="0dp"
+        android:layout_height="55dp"
+        android:layout_weight=".5"
+        android:text="@string/find_text_button"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/button_face" />
 
-        <Button
-            android:id="@+id/button_face"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="0dp"
-            android:layout_height="55dp"
-            android:layout_weight=".5"
-            android:text="@string/find_face_contour_button"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent" />
-    </LinearLayout>
+    <Button
+        android:id="@+id/button_face"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="0dp"
+        android:layout_height="55dp"
+        android:layout_weight=".5"
+        android:text="@string/find_face_contour_button"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent" />
+</LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

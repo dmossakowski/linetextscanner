@@ -16,6 +16,7 @@ package com.rtstyk.linetextscanner;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -30,6 +31,11 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -179,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         mSelectedImage = getBitmapFromAsset(this, "receipt1.jpg");
         mImageView.setImageBitmap(mSelectedImage);
+        helpActivated=true;
 
 
 
@@ -243,7 +250,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             //helpImage.g
             mImageView.setImageBitmap(helpImage);
             helpActivated=true;
+        }else if(item.getItemId() == R.id.item_scan) {
+            dispatchIntentChoice();
         }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -251,9 +261,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void doLocalTest()
     {
-        mSelectedImage = getBitmapFromAsset(this, "receipt4.jpg");
+        mSelectedImage = getBitmapFromAsset(this, "receipt3.jpg");
         int height = mImageView.getHeight();
         int width = mImageView.getWidth();
+        //return MediaStore.Images.Media.insertImage(cr, filepath.toString(),
+          //      filepath.getName(), "Image Description");
+
 
 
 
@@ -296,6 +309,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             mImageView.setImageBitmap(mSelectedImage);
             mGraphicOverlay.setVisibility(View.VISIBLE);
             helpActivated=false;
+
+            //dispatchIntentChoice();
+            dispatchTakePictureIntent();
             return true;
         }
 
@@ -308,8 +324,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         @Override
         public boolean onDown(MotionEvent event) {
-            //Log.d(DEBUG_TAG,"onDown: " + event.toString());
-
+            Log.d(DEBUG_TAG,"onDown: " + event.toString());
+            //view.requestPointerCapture()
             return true;
         }
 
@@ -319,12 +335,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             ClipData clip = ClipData.newPlainText("text", textView.getText());
             clipboard.setPrimaryClip(clip);
             Toast.makeText(getApplicationContext(), "Text copied to clipboard", Toast.LENGTH_SHORT).show();
-            //Log.i("longpress","long press");
+            Log.i("longpress","long press");
         }
 
         @Override
         public boolean onSingleTapUp(MotionEvent event) {
-            //Log.d(DEBUG_TAG, "onSingleTapUp: " + event.toString());
+            Log.d(DEBUG_TAG, "onSingleTapUp: " + event.toString());
 
             //Toast.makeText(getApplicationContext(), "jjj", Toast.LENGTH_SHORT).show();
             //Log.i("single tup","tap ");
@@ -616,10 +632,58 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 })
                                 ;
                     break;
+                case 103:
+
+                    break;
+
             }
 
 
         }
+    }
+
+    private void dispatchIntentChoice()
+    {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+
+
+
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.rtstyk.linetextscanner.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+            }
+        }
+
+        //IntentSender intentSender = new ActivityResultContracts.StartIntentSenderForResult()
+        Intent chooser = Intent.createChooser(takePictureIntent, "Some text here");
+        chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] { galleryIntent });
+
+
+        ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
+                new ActivityResultCallback<Uri>() {
+                    @Override
+                    public void onActivityResult(Uri uri) {
+                        // Handle the returned Uri
+                    }
+                });
+        startActivity(chooser);
+        Log.i("intent", " no idea "+chooser.getSelector()+" "+chooser.getAction());
+
+
+
     }
 
 
@@ -631,15 +695,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //startActivityForResult(takePicture, 0);
     }
 
+
+
     private void dispatchTakePictureIntent()
     {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
         PackageManager pm = getPackageManager();
 
-        ActivityInfo activityInfo = takePictureIntent.resolveActivityInfo(pm, takePictureIntent.getFlags());
-        if (activityInfo.exported) {
-            Log.i("intent", " no idea "+activityInfo.name);
+        ComponentName activityInfo = takePictureIntent.resolveActivity(pm);
+        //ActivityInfo activityInfo = takePictureIntent.resolveActivityInfo( pm, takePictureIntent.getFlags());
+        if (activityInfo == null) {
+            Log.i("intent", " no idea "+activityInfo.flattenToShortString());
         }
 
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -732,12 +799,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 //openGallery();
                 dispatchTakePictureIntent();
                 //selectImage(getApplicationContext());
+                //dispatchIntentChoice();
                 break;
             case 1:
                 // Whatever you want to happen when the thrid item gets selected
                 //mSelectedImage = getBitmapFromAsset(this, "receipt4.jpg");
-                //openGallery();
-                doLocalTest();
+                openGallery();
+                //dispatchIntentChoice();
+                //doLocalTest();
 
 
 
