@@ -8,6 +8,11 @@
         android:title="@string/toolbar_mi_camera"
         android:visible="false" />
     <item
+        android:id="@+id/item_copy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="@string/toolbar_mi_copy" />
+    <item
         android:id="@+id/item_help"
         android:title="@string/toolbar_mi_help" />
     <item

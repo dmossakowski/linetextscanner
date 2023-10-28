@@ -6,8 +6,8 @@ android {
         applicationId "com.rtstyk.linetextscanner"
         minSdkVersion 19
         targetSdkVersion 33
-        versionCode 6
-        versionName "1.0.6"
+        versionCode 9
+        versionName "1.0.9"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -40,7 +40,7 @@ dependencies {
     //implementation 'com.google.mlkit:face-detection:16.0.0'
 
     // Text features
-    implementation 'com.google.android.gms:play-services-mlkit-text-recognition:16.0.0'
+    implementation 'com.google.android.gms:play-services-mlkit-text-recognition:19.0.0'
 
     //glide library for photo and video management
     implementation 'com.github.bumptech.glide:glide:4.12.0'

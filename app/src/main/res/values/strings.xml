@@ -5,9 +5,10 @@
     <string name="find_face_contour_button">Camera</string>
     <string name="find_text_cloud_button">Find text (cloud)</string>
     <string name="find_objects_button">Find objects</string>
-    <string name="toolbar_mi_developer_page">Developed by David Mossakowski</string>
+    <string name="toolbar_mi_developer_page">Developer site</string>
     <string name="toolbar_mi_help">Help</string>
     <string name="toolbar_mi_scan">Scan</string>
-    <string name="toolbar_mi_camera">Scan</string>
-    <string name="toolbar_mi_gallery">Scan</string>
+    <string name="toolbar_mi_camera">Camera</string>
+    <string name="toolbar_mi_gallery">Gallery</string>
+    <string name="toolbar_mi_copy">Copy text to clipboard</string>
 </resources>
