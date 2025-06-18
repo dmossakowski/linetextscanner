@@ -31,27 +31,42 @@ import com.google.mlkit.vision.text.Text;
 public class TextGraphic extends Graphic {
 
     private static final String TAG = "TextGraphic";
-    private static final int TEXT_COLOR = Color.WHITE;
-    private static final float TEXT_SIZE = 50.0f;
-    private static final float STROKE_WIDTH = 4.0f;
+    private static final int TEXT_COLOR = Color.BLACK;
+
+    private int color;
+    private int id;
+    private static final float TEXT_SIZE = 46.0f;
+    private static final float STROKE_WIDTH = 14.0f;
 
     private final Paint rectPaint;
     private final Paint textPaint;
     private final Text.Element element;
 
     TextGraphic(GraphicOverlay overlay, Text.Element element) {
+        this(overlay, element, TEXT_COLOR);
+    }
+    TextGraphic(GraphicOverlay overlay, Text.Element element, int color) {
         super(overlay);
 
         this.element = element;
+        this.id = color;
+        //this.color = getDistinctColor(color);
+        this.color=Color.BLACK;
 
         rectPaint = new Paint();
-        rectPaint.setColor(TEXT_COLOR);
-        rectPaint.setStyle(Paint.Style.STROKE);
+        rectPaint.setColor(Color.WHITE);
+        //rectPaint.setStyle(Paint.Style.STROKE);
+        rectPaint.setStyle(Paint.Style.FILL);
         rectPaint.setStrokeWidth(STROKE_WIDTH);
+        rectPaint.setAlpha(200);
 
         textPaint = new Paint();
-        textPaint.setColor(TEXT_COLOR);
+        textPaint.setColor(this.color);
         textPaint.setTextSize(TEXT_SIZE);
+        //textPaint.setAntiAlias(true);
+        textPaint.setFakeBoldText(true);
+        textPaint.setShadowLayer(4, 0, 0, Color.WHITE); // Example: Add a black shadow with a radius of 3
+
         //textPaint.sette
         // Redraw the overlay, as this graphic has been added.
         postInvalidate();
@@ -69,10 +84,12 @@ public class TextGraphic extends Graphic {
 
         // Draws the bounding box around the TextBlock.
         RectF rect = new RectF(element.getBoundingBox());
-        //canvas.drawRect(rect, rectPaint);
+        canvas.drawRect(rect, rectPaint);
 
         // Renders the text at the bottom of the box.
+        //canvas.drawText(this.id+ " ", rect.left, rect.bottom, textPaint);
         canvas.drawText(element.getText(), rect.left, rect.bottom, textPaint);
+
     }
 
     public Rect getBoundingBox()
@@ -89,4 +106,33 @@ public class TextGraphic extends Graphic {
     {
         return element;
     }
+
+
+
+    private static int getDistinctColor(int index) {
+        // List of visually distinct Android colors
+        int[] colors = {
+                Color.parseColor("#2E7D32"), // Dark Green
+                Color.parseColor("#4E342E"), // Brown
+                Color.parseColor("#1A237E"), // Dark Blue
+                Color.parseColor("#6A1B9A"), // Purple
+                Color.parseColor("#880E4F"), // Dark Pink
+                Color.parseColor("#3E2723"), // Dark Brown
+                Color.parseColor("#004D40"), // Teal
+                Color.parseColor("#E65100"), // Orange
+                Color.parseColor("#BF360C"), // Deep Orange
+                Color.parseColor("#4A148C"), // Indigo
+                Color.parseColor("#263238"), // Dark Blue Gray
+                Color.parseColor("#D84315"), // Dark Deep Orange
+                Color.parseColor("#006064"), // Dark Cyan
+                Color.parseColor("#5D4037"), // Dark Gray
+        };
+
+        // Calculate the index within the bounds of the color array
+        int colorIndex = index % colors.length;
+
+        // Return the selected color
+        return colors[colorIndex];
+    }
+
 }

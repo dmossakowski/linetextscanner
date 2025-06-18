@@ -73,6 +73,7 @@ import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 import com.rtstyk.linetextscanner.GraphicOverlay.Graphic;
 
 import java.io.File;
@@ -158,8 +159,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         textView = findViewById(R.id.text);
         //textView.setText("Ready...");
-        textView.setTextColor(Color.WHITE);
+        textView.setTextColor(Color.BLACK);
         textView.setVisibility(View.INVISIBLE);
+        //textView.set
 
         //setContentView(R.layout.activity_main);
         mDetector = new GestureDetectorCompat(mImageView.getContext(), new MyGestureListener());
@@ -224,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 .simple_spinner_dropdown_item, items);
         dropdown.setAdapter(adapter);
         dropdown.setOnItemSelectedListener(this);*/
-    }
+   }
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -252,6 +254,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             helpActivated=true;
         }else if(item.getItemId() == R.id.item_scan) {
             dispatchIntentChoice();
+        }else if (item.getItemId() == R.id.item_copy){
+            copyTextToClipboard();
         }
 
 
@@ -306,12 +310,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public boolean onTouchEvent(MotionEvent event){
         if (helpActivated){
-            mImageView.setImageBitmap(mSelectedImage);
-            mGraphicOverlay.setVisibility(View.VISIBLE);
+            //mImageView.setImageBitmap(mSelectedImage);
+            //mGraphicOverlay.setVisibility(View.VISIBLE);
             helpActivated=false;
+            Log.i("toucheevent","help active");
 
             //dispatchIntentChoice();
-            dispatchTakePictureIntent();
+            //dispatchTakePictureIntent();
             return true;
         }
 
@@ -319,30 +324,44 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return super.onTouchEvent(event);
     }
 
+    private void copyTextToClipboard(){
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("text", textView.getText());
+        clipboard.setPrimaryClip(clip);
+        Toast.makeText(getApplicationContext(), "Text copied to clipboard", Toast.LENGTH_SHORT).show();
+        Log.i("longpress","long press");
+
+    }
+
+
     class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
         private static final String DEBUG_TAG = "Gestures";
 
         @Override
         public boolean onDown(MotionEvent event) {
-            Log.d(DEBUG_TAG,"onDown: " + event.toString());
+            //Log.d(DEBUG_TAG,"onDown: " + event.toString());
             //view.requestPointerCapture()
             return true;
         }
 
         @Override
         public void onLongPress(MotionEvent even){
-            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            ClipData clip = ClipData.newPlainText("text", textView.getText());
-            clipboard.setPrimaryClip(clip);
-            Toast.makeText(getApplicationContext(), "Text copied to clipboard", Toast.LENGTH_SHORT).show();
-            Log.i("longpress","long press");
+            copyTextToClipboard();
         }
 
-        @Override
-        public boolean onSingleTapUp(MotionEvent event) {
-            Log.d(DEBUG_TAG, "onSingleTapUp: " + event.toString());
 
-            //Toast.makeText(getApplicationContext(), "jjj", Toast.LENGTH_SHORT).show();
+
+
+            @Override
+        public boolean onSingleTapUp(MotionEvent event) {
+            //Log.d(DEBUG_TAG, "onSingleTapUp: " + event.toString());
+
+            if (textView.getVisibility() == View.VISIBLE) {
+                switchTextViews();
+                return true;
+            }
+
+                //Toast.makeText(getApplicationContext(), "jjj", Toast.LENGTH_SHORT).show();
             //Log.i("single tup","tap ");
             // check if tap is within a rectangle of recognized text
             //switchTextViews();
@@ -424,6 +443,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 redoText();
             }
 
+            if (found==null)
+                switchTextViews();
+
 
                 //mGraphicOverlay.
 
@@ -440,6 +462,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                float velocityX, float velocityY) {
             //Log.d(DEBUG_TAG, "onFling: " + e1.toString() + e2.toString());
             //mGraphicOverlay.clear();
+            if (e1 == null || e2 == null)
+            {
+                return false;
+            }
             if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                 // Right to left
                 //return false;
@@ -923,7 +949,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void runTextRecognition() {
         InputImage image = InputImage.fromBitmap(mSelectedImage, 0);
-        TextRecognizer recognizer = TextRecognition.getClient();
+        TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
         //mTextButton.setEnabled(false);
 
         recognizer.process(image)
@@ -957,22 +983,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mGraphicOverlay.clear();
 
         List<Text.Element> textElements = new ArrayList<>();
-
+        int idx = 0;
         for (int i = 0; i < blocks.size(); i++) {
             Rect rect = blocks.get(i).getBoundingBox();
             //Log.i("rect", rect.top + " " + rect.right + " " + rect.bottom);
 
             List<Text.Line> lines = blocks.get(i).getLines();
-            //Log.i("rect", rect.centerX() + " " + rect.centerY() + " " + rect.toString());
 
+            //Log.i("rect", i+" "+rect.centerX() + " " + rect.centerY() + " " + rect.toString());
             for (int j = 0; j < lines.size(); j++) {
                 List<Text.Element> elements = lines.get(j).getElements();
                 for (int k = 0; k < elements.size(); k++) {
                     Text.Element e = elements.get(k);
                     textElements.add(e);
                     //Log.i(i+"-",j+"-"+k+" "+elements.get(k).getText());
-                    GraphicOverlay.Graphic textGraphic = new TextGraphic(mGraphicOverlay, e);
+                    GraphicOverlay.Graphic textGraphic = new TextGraphic(mGraphicOverlay, e, textElements.size());
                     mGraphicOverlay.add(textGraphic);
+                    idx++;
                 }
             }
         }
@@ -989,24 +1016,30 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         sortedTextElements = regenerateText(textElements, textView);
     }
 
-
+    /*
+    Generate actual text strings from textElements
+     */
     private List<Text.Element> regenerateText(List<Text.Element> textElements, TextView lTextView)
     {
-        Log.d("sorting",textElements.size()+" ------------------------------ ");
+        //Log.d("sorting",textElements.size()+" ------------------------------ ");
         Collections.sort(textElements, textElementComparator);
-        Log.d("processing",textElements.size()+" ------------------------------ ");
+        //Log.d("processing",textElements.size()+" ------------------------------ ");
 
+        /*for (Text.Element e: textElements)
+        {
+            Log.d("sorted ", e.getText());
+        }*/
         List<List<Text.Element>> lines = new ArrayList<>();
         List<Text.Element> currentLine = new ArrayList<>();
         lines.add(currentLine);
 
-        // process and save only lines with prices
+        // process elements into horizontal lines
         for (int i = 0; i < textElements.size(); i++) {
 
             Rect rect = textElements.get(i).getBoundingBox();
             Text.Element element = textElements.get(i);
-            Log.d("rect" + i, rect.top + " " + rect.left + " " + rect.bottom + " c:x" +
-                    rect.centerX() + " cy:" + rect.centerY() + " " + element.getText());
+            //Log.d("rect" + i, rect.top + " " + rect.left + " " + rect.bottom + " c:x" +
+              //      rect.centerX() + " cy:" + rect.centerY() + " " + element.getText());
 
             if (currentLine.size() == 0)
                 currentLine.add(element);
@@ -1014,7 +1047,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 Text.Element previousElement = currentLine.get(currentLine.size() - 1);
                 if (isSameLine(previousElement, element)) {
                     currentLine.add(element);
-                    Log.d("same line", previousElement.getText() + " " + element.getText() + " ");
+                    //Log.d("same line", previousElement.getText() + " " + element.getText() + " ");
                 } else { //evaluate if we should keep this line
                     String t = previousElement.getText();
                     //if (t.contains(",") && t.matches("^[0-9].*$"))
@@ -1026,12 +1059,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         lines.add(currentLine);
 
 
-                    Log.i("new line", element.getText() + " ");
-                    //} else {
-                    //    currentLine.clear();
-                    //    currentLine.add(element);
-                    //    Log.i("line clear", element.getText() + " ");
-                    //}
+                    //Log.i("new line", element.getText() + " ");
+
                 }
             }
         }
@@ -1049,6 +1078,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 if (j+1 == line.size())
                 {
                     s+= " \n";
+                    //Log.i("new line", s + " ");
+
                 }
             }
         }
@@ -1091,37 +1122,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         int diffOfTops = t1.getBoundingBox().top - t2.getBoundingBox().top;
         //int diffOfLefts = t1.getBoundingBox().left - t2.getBoundingBox().left;
 
-        int height = (t1.getBoundingBox().height() + t2.getBoundingBox().height()) / 2;
+        int heightSum = (int)((t1.getBoundingBox().height() + t2.getBoundingBox().height()));
 
-        //Log.i("compare", t1.getText()+"-"+t2.getText()+"  "+diffOfTops +" "+diffOfLefts+ " height:"+height);
+        int height = (int)((t1.getBoundingBox().height() + t2.getBoundingBox().height()) * 0.35);
 
+        //Log.i("sameline", t1.getText()+"-"+t2.getText()+"  "+diffOfLefts +"  diffOfTops:"+diffOfTops+" sum="+heightSum);
+        //Log.i("sameline", t1.getText()+"-"+t2.getText()+"   diffOfTops:"+diffOfTops+" sum="+heightSum+
+          //      " height="+height);
+
+        ///return diffOfLefts < 0;
         if (Math.abs(diffOfTops) > height ) {
             return false;
         }
         return true;
-    }
-
-    class TextElementComparator2 implements Comparator<Text.Element> {
-        @Override
-        public int compare(Text.Element t1, Text.Element t2) {
-            int diffOfTops = t1.getBoundingBox().top - t2.getBoundingBox().top;
-            int diffOfBottoms = t1.getBoundingBox().bottom - t2.getBoundingBox().bottom;
-            int diffOfLefts = t1.getBoundingBox().left - t2.getBoundingBox().left;
-
-            int height = (t1.getBoundingBox().height() + t2.getBoundingBox().height()) / 2;
-
-            int result;
-            if (Math.abs(diffOfTops) > (height + height * 0.25)) {
-                result =  diffOfTops;
-            }else {
-                result = diffOfLefts;
-            }
-            //Log.d("compare", t1.getBoundingBox().top+ " "+ t2.getBoundingBox().top+
-              //      " " + t1.getBoundingBox().left+ " " + t2.getBoundingBox().left+ " "+
-                //    diffOfTops + " " + diffOfLefts + " height:" + height+"  "+result +"  "+
-                  //  t1.getText() + "-" + t2.getText() + "  " );
-            return result;
-        }
     }
 
     class TextElementComparator implements Comparator<Text.Element> {
@@ -1130,16 +1143,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             int diffOfTops = t1.getBoundingBox().top - t2.getBoundingBox().top;
             int diffOfLefts = t1.getBoundingBox().left - t2.getBoundingBox().left;
 
-            int height = (t1.getBoundingBox().height() + t2.getBoundingBox().height()) / 2;
+            int height = (t1.getBoundingBox().height() + t2.getBoundingBox().height());
+            int verticalDiff = (int)(height * 0.35);
 
-            //Log.i("compare", t1.getText() + "-" + t2.getText() + "  " + diffOfTops + " " + diffOfLefts + " height:" + height);
+            int result = diffOfLefts;
 
-            if (Math.abs(diffOfTops) > height / 2) {
-                return diffOfTops;
+            if (Math.abs(diffOfTops) > verticalDiff) {
+                result = diffOfTops;
             }
-            return diffOfLefts;
+
+            //Log.i("compare", t1.getText() + "-" + t2.getText() + " v" + diffOfTops + ">"+verticalDiff+
+              //      " <" + diffOfLefts +" |" + height +" ="+result);
+
+            return result;
         }
     }
+
+
 
 
 
