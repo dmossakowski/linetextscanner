@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 .simple_spinner_dropdown_item, items);
         dropdown.setAdapter(adapter);
         dropdown.setOnItemSelectedListener(this);*/
-    }
+   }
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
