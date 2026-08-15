@@ -354,7 +354,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             @Override
         public boolean onSingleTapUp(MotionEvent event) {
-            //Log.d(DEBUG_TAG, "onSingleTapUp: " + event.toString());
+            Log.d(DEBUG_TAG, "onSingleTapUp: " + event.toString());
 
             if (textView.getVisibility() == View.VISIBLE) {
                 switchTextViews();
